@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import (
    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
    QScrollArea, QFrame, QLabel, QSizePolicy, QLayout
 )
-from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal, QSize
 
 MODEL_NAME = "deepseek-r1:32b"
 OLLAMA_URL = "http://localhost:11434/api/chat"
@@ -83,7 +84,7 @@ class Bubble(QFrame):
       
       self.setStyleSheet(f"""
          QFrame {{
-            background-color: {'#d1f0ff' if sender == 'AI' else '#e0e0e0'};
+            background-color: {'#e0e0e0' if sender == 'AI' else '#d1f0ff'};
             color: #000;
             border-radius: 12px;
             padding: 10px 14px;
@@ -117,7 +118,7 @@ class Bubble(QFrame):
 class ChatWindow(QWidget):
    def __init__(self):
       super().__init__()
-      self.setWindowTitle("DeepSeek Chatbot")
+      self.setWindowTitle("Chatbot")
       self.resize(650, 800)
       
       main_layout = QVBoxLayout(self)
@@ -147,7 +148,9 @@ class ChatWindow(QWidget):
             }
          """)
       self.input_line.setPlaceholderText("Type your message...")
-      self.send_btn = QPushButton("Send")
+      self.send_btn = QPushButton()
+      self.send_btn.setIcon(QIcon("./assets/send_icon.png"))
+      self.send_btn.setIconSize(QSize(24, 24))
       self.send_btn.setStyleSheet("""
             QPushButton {
                background: white;
@@ -195,7 +198,7 @@ class ChatWindow(QWidget):
                # Complete the bubble text immediately
                self.current_bubble_label.text_label.setText(self.pending_text)
          self.ai_thinking = False
-         self.send_btn.setText("Send")
+         self.send_btn.setIcon(QIcon("./assets/send_icon.png"))
          return
       
       # Otherwise, normal send
@@ -211,13 +214,13 @@ class ChatWindow(QWidget):
       self.ai_worker.error.connect(lambda e: self.add_bubble(f"Error: {e}", "AI"))
       self.ai_worker.start()
       self.ai_thinking = True
-      self.send_btn.setText("Stop")
+      self.send_btn.setIcon(QIcon("./assets/stop_icon.png"))
    
    def start_typing_animation(self, text):
       if not text:
          # AI returned empty, no bubble
          self.ai_thinking = False
-         self.send_btn.setText("Send")
+         self.send_btn.setIcon(QIcon("./assets/send_icon.png"))
          return
       
       # Bubble with "..." for AI
@@ -242,7 +245,7 @@ class ChatWindow(QWidget):
       else:
          self.typing_timer.stop()
          self.ai_thinking = False
-         self.send_btn.setText("Send")
+         self.send_btn.setIcon(QIcon("./assets/send_icon.png"))
 
 
 
